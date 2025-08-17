@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  FitnessTracker2
 //
-//  Created by 沼田蓮二朗 on 2025/08/17.
+//  Created by Assistant on 2025/08/17.
 //
 
 import SwiftUI
@@ -10,76 +10,130 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    @StateObject private var healthKitManager = HealthKitManager()
+    
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
-                    }
+        TabView {
+            // ホーム画面
+            HomeView()
+                .environment(\.managedObjectContext, viewContext)
+                .environmentObject(healthKitManager)
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("ホーム")
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+            
+            // 筋トレ画面
+            WorkoutView()
+                .environment(\.managedObjectContext, viewContext)
+                .environmentObject(healthKitManager)
+                .tabItem {
+                    Image(systemName: "dumbbell.fill")
+                    Text("筋トレ")
                 }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+            
+            // 食事画面
+            FoodView()
+                .environment(\.managedObjectContext, viewContext)
+                .tabItem {
+                    Image(systemName: "fork.knife")
+                    Text("食事")
                 }
-            }
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+            
+            // 体組成画面
+            BodyCompositionView()
+                .environment(\.managedObjectContext, viewContext)
+                .environmentObject(healthKitManager)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("体組成")
+                }
+            
+            // 設定画面
+            SettingsView()
+                .tabItem {
+                    Image(systemName: "gearshape.fill")
+                    Text("設定")
+                }
         }
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
+// MARK: - 設定画面（簡易版）
+struct SettingsView: View {
+    var body: some View {
+        NavigationView {
+            List {
+                Section("基本設定") {
+                    HStack {
+                        Image(systemName: "person.fill")
+                        Text("プロフィール設定")
+                    }
+                    
+                    HStack {
+                        Image(systemName: "bell.fill")
+                        Text("通知設定")
+                    }
+                    
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                        Text("データエクスポート")
+                    }
+                }
+                
+                Section("その他") {
+                    HStack {
+                        Image(systemName: "questionmark.circle")
+                        Text("ヘルプ")
+                    }
+                    
+                    HStack {
+                        Image(systemName: "info.circle")
+                        Text("アプリについて")
+                    }
+                }
+            }
+            .navigationTitle("設定")
+        }
+    }
+}
+
+// MARK: - 仮のView定義（実際は別ファイルで実装）
+struct HomeView: View {
+    var body: some View {
+        NavigationView {
+            Text("ホーム画面")
+                .navigationTitle("ホーム")
+        }
+    }
+}
+
+struct WorkoutView: View {
+    var body: some View {
+        NavigationView {
+            Text("筋トレ画面")
+                .navigationTitle("筋トレ")
+        }
+    }
+}
+
+struct FoodView: View {
+    var body: some View {
+        NavigationView {
+            Text("食事画面")
+                .navigationTitle("食事")
+        }
+    }
+}
+
+struct BodyCompositionView: View {
+    var body: some View {
+        NavigationView {
+            Text("体組成画面")
+                .navigationTitle("体組成")
+        }
+    }
+}
 
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
