@@ -98,43 +98,6 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - 仮のView定義（実際は別ファイルで実装）
-struct HomeView: View {
-    var body: some View {
-        NavigationView {
-            Text("ホーム画面")
-                .navigationTitle("ホーム")
-        }
-    }
-}
-
-struct WorkoutView: View {
-    var body: some View {
-        NavigationView {
-            Text("筋トレ画面")
-                .navigationTitle("筋トレ")
-        }
-    }
-}
-
-struct FoodView: View {
-    var body: some View {
-        NavigationView {
-            Text("食事画面")
-                .navigationTitle("食事")
-        }
-    }
-}
-
-struct BodyCompositionView: View {
-    var body: some View {
-        NavigationView {
-            Text("体組成画面")
-                .navigationTitle("体組成")
-        }
-    }
-}
-
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
