@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  FitnessTracker2
 //
-//  Created by Assistant on 2025/08/17.
+//  Created by 沼田蓮二朗 on 2025/08/17.
 //
 
 import SwiftUI
@@ -10,14 +10,11 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var healthKitManager = HealthKitManager()
     
     var body: some View {
         TabView {
             // ホーム画面
             HomeView()
-                .environment(\.managedObjectContext, viewContext)
-                .environmentObject(healthKitManager)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
@@ -25,8 +22,6 @@ struct ContentView: View {
             
             // 筋トレ画面
             WorkoutView()
-                .environment(\.managedObjectContext, viewContext)
-                .environmentObject(healthKitManager)
                 .tabItem {
                     Image(systemName: "dumbbell.fill")
                     Text("筋トレ")
@@ -34,7 +29,6 @@ struct ContentView: View {
             
             // 食事画面
             FoodView()
-                .environment(\.managedObjectContext, viewContext)
                 .tabItem {
                     Image(systemName: "fork.knife")
                     Text("食事")
@@ -42,8 +36,6 @@ struct ContentView: View {
             
             // 体組成画面
             BodyCompositionView()
-                .environment(\.managedObjectContext, viewContext)
-                .environmentObject(healthKitManager)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("体組成")
@@ -56,10 +48,11 @@ struct ContentView: View {
                     Text("設定")
                 }
         }
+        .environment(\.managedObjectContext, viewContext)
     }
 }
 
-// MARK: - 設定画面（簡易版）
+// MARK: - 設定画面
 struct SettingsView: View {
     var body: some View {
         NavigationView {
